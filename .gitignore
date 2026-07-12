@@ -17,3 +17,5 @@ build/
 .vscode/
 .local/
 .coverage
+frontend/node_modules/
+frontend/.next/
