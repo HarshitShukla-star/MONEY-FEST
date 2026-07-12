@@ -7,7 +7,7 @@ This is the authoritative architecture for the repository. The top-level folders
 Dependencies must point toward stable policy:
 
 ```text
-config, logging, utils, and future delivery code
+config, logging, utils, and app (delivery/composition)
                     |
                     v
                  core
@@ -26,6 +26,7 @@ config, logging, utils, and future delivery code
 | Location | Responsibility | Future code belongs here when |
 | --- | --- | --- |
 | `src/content_pipeline/` | The importable application package and deliberately small public API. | Exporting only stable, high-level public types. Do not import feature implementations here merely for convenience. |
+| `src/content_pipeline/app/` | The composition root and delivery mechanism: OAuth/provider client construction, environment-driven service wiring, the CLI, and end-to-end workflow orchestration. | Code needs to read `Settings`, construct a real provider client (OAuth, SDK), choose which adapter backs a `core` port, or chain multiple `core` use cases into one operator-facing run. This is the only package allowed to do those things. |
 | `src/content_pipeline/core/` | Application use cases, orchestration, dependency wiring, and consumer-owned `Protocol` ports. | A workflow coordinates domain models or calls a dependency. Place a single use case in a module here; use a child package only when the use case family is cohesive. Provider adapters live beside the consumer-owned port in a clearly named implementation module until a dedicated existing boundary is introduced by an explicitly approved architecture change. |
 | `src/content_pipeline/domain/` | Framework-independent business concepts and rules. | The code expresses a durable business invariant, entity, value object, or policy with no I/O. |
 | `src/content_pipeline/domain/models/` | Generic domain value and response models. | A reusable, framework-independent model is shared by more than one domain or core module. Product-specific models should live next to their owning core use case instead. |
