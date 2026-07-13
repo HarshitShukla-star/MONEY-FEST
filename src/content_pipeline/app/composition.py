@@ -15,10 +15,12 @@ from content_pipeline.app.oauth import (
 from content_pipeline.config import Settings
 from content_pipeline.core.channels import ChannelManager, JsonChannelRepository
 from content_pipeline.core.clips.cutter import ClipCutter
-from content_pipeline.core.clips.openai_selector import OpenAISegmentSelector
 from content_pipeline.core.clips.service import ClipCuttingService
-from content_pipeline.core.clips.whisper_provider import WhisperTranscriptionProvider
-from content_pipeline.core.metadata.openai_provider import OpenAIMetadataProvider
+from content_pipeline.core.gemini.provider import (
+    GeminiMetadataProvider,
+    GeminiSegmentSelector,
+    GeminiTranscriptionProvider,
+)
 from content_pipeline.core.trends.service import TrendScanService
 from content_pipeline.core.trends.youtube_provider import YouTubeTrendProvider
 from content_pipeline.core.uploads.service import UploadService
@@ -55,17 +57,17 @@ def build_trend_service(
 
 
 def build_clip_cutting_service(settings: Settings) -> ClipCuttingService:
-    """Build the clip cutting service from OpenAI Whisper and selection adapters."""
+    """Build the clip cutting service from Gemini-powered adapters."""
     return ClipCuttingService(
-        transcription_provider=WhisperTranscriptionProvider(settings),
-        segment_selector=OpenAISegmentSelector(settings),
+        transcription_provider=GeminiTranscriptionProvider(settings),
+        segment_selector=GeminiSegmentSelector(settings),
         cutter=ClipCutter(),
     )
 
 
-def build_metadata_provider(settings: Settings) -> OpenAIMetadataProvider:
-    """Build the OpenAI-backed metadata (title/description/hashtags) provider."""
-    return OpenAIMetadataProvider(settings)
+def build_metadata_provider(settings: Settings) -> GeminiMetadataProvider:
+    """Build the Gemini-backed metadata (title/description/hashtags) provider."""
+    return GeminiMetadataProvider(settings)
 
 
 def build_upload_service(settings: Settings, channels: ChannelManager) -> UploadService:
@@ -74,8 +76,8 @@ def build_upload_service(settings: Settings, channels: ChannelManager) -> Upload
     return UploadService(YouTubeUploadProvider(client), channels)
 
 
-def require_openai_key(settings: Settings) -> None:
-    """Fail fast with a clear message when the OpenAI key is missing."""
-    key = settings.openai_api_key
+def require_gemini_key(settings: Settings) -> None:
+    """Fail fast with a clear message when the Gemini key is missing."""
+    key = settings.gemini_api_key
     if key is None or not key.get_secret_value().strip():
-        raise ConfigurationError("OPENAI_API_KEY must be configured")
+        raise ConfigurationError("GEMINI_API_KEY must be configured")

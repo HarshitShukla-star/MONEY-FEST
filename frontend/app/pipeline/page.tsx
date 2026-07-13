@@ -5,7 +5,7 @@ import { Check, Circle, Loader2, XCircle } from "lucide-react";
 import { ErrorState, LoadingState } from "@/components/async-state";
 import { PageHeader } from "@/components/page-header";
 import { Progress, StatusPill } from "@/components/ui";
-import { api } from "@/lib/mock-api";
+import { api } from "@/lib/api";
 
 export default function Pipeline() {
   const pipelineQuery = useQuery({ queryKey: ["pipeline"], queryFn: api.getPipeline });

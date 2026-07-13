@@ -5,7 +5,7 @@ import { Activity, ArrowUpRight, CheckCircle2, Clock3, Upload } from "lucide-rea
 import { ErrorState, LoadingState } from "@/components/async-state";
 import { PageHeader } from "@/components/page-header";
 import { Progress, StatusPill } from "@/components/ui";
-import { api } from "@/lib/mock-api";
+import { api } from "@/lib/api";
 
 const statIcons = { activity: Activity, check: CheckCircle2, clock: Clock3, upload: Upload };
 const statTones = { blue: "text-blue-300", emerald: "text-emerald-300", amber: "text-amber-200", violet: "text-violet-300" };

@@ -2,7 +2,7 @@
 
 import { Copy, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { ChannelStatus, Status } from "@/lib/mock-api";
+import type { ChannelStatus, Status } from "@/lib/api";
 
 export function StatusPill({ status }: { status: Status | ChannelStatus }) {
   const styles: Record<Status | ChannelStatus, string> = {

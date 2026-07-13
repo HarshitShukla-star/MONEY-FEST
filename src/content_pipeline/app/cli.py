@@ -19,8 +19,9 @@ from content_pipeline.app.composition import (
     build_metadata_provider,
     build_trend_service,
     build_upload_service,
-    require_openai_key,
+    require_gemini_key,
 )
+from content_pipeline.app.server import serve
 from content_pipeline.app.oauth import SCOPE_READONLY, SCOPE_UPLOAD, run_oauth_login
 from content_pipeline.app.pipeline import ContentPipeline, PipelineRunRequest
 from content_pipeline.config import get_settings
@@ -70,6 +71,13 @@ def _build_parser() -> argparse.ArgumentParser:
         "oauth-login", help="Run the interactive YouTube OAuth consent flow."
     )
     oauth_parser.set_defaults(handler=_handle_oauth_login)
+
+    serve_parser = subparsers.add_parser(
+        "serve", help="Start the local JSON API for the frontend console."
+    )
+    serve_parser.add_argument("--host", default="127.0.0.1")
+    serve_parser.add_argument("--port", type=int, default=8000)
+    serve_parser.set_defaults(handler=_handle_serve)
 
     channel_parser = subparsers.add_parser(
         "channels", help="Manage publishing channels."
@@ -153,6 +161,11 @@ def _handle_oauth_login(args: argparse.Namespace) -> int:
     return 0
 
 
+def _handle_serve(args: argparse.Namespace) -> int:
+    serve(host=args.host, port=args.port)
+    return 0
+
+
 def _handle_channels_add(args: argparse.Namespace) -> int:
     settings = get_settings()
     manager = build_channel_manager(settings)
@@ -211,7 +224,7 @@ def _build_effects_plan(args: argparse.Namespace) -> EffectPlan | None:
 
 def _handle_run(args: argparse.Namespace) -> int:
     settings = get_settings()
-    require_openai_key(settings)
+    require_gemini_key(settings)
     channels = build_channel_manager(settings)
     pipeline = ContentPipeline(
         clip_service=build_clip_cutting_service(settings),
