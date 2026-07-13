@@ -19,3 +19,4 @@ build/
 .coverage
 frontend/node_modules/
 frontend/.next/
+output/

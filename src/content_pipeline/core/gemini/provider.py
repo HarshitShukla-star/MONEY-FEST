@@ -56,13 +56,7 @@ class GeminiClient:
             "contents": [{"role": "user", "parts": parts}],
             "generationConfig": {"responseMimeType": "application/json"},
         }
-        url = f"{_API_ROOT}/models/{self._model}:generateContent"
-        response = requests.post(url, params={"key": self._key}, json=payload, timeout=120)
-        try:
-            response.raise_for_status()
-        except requests.HTTPError as exc:
-            raise ProviderError(f"Gemini request failed: {response.text}") from exc
-        body = response.json()
+        body = self._post_with_fallbacks(payload)
         try:
             candidates = body["candidates"]
             content = candidates[0]["content"]["parts"]
@@ -70,6 +64,29 @@ class GeminiClient:
         except Exception as exc:
             raise ProviderError("Gemini returned an invalid response") from exc
         return text.strip()
+
+    def _post_with_fallbacks(self, payload: dict[str, Any]) -> dict[str, Any]:
+        models = [self._model, "gemini-2.5-flash-lite", "gemini-2.5-flash"]
+        seen: set[str] = set()
+        last_error: str | None = None
+        for model in models:
+            if model in seen:
+                continue
+            seen.add(model)
+            url = f"{_API_ROOT}/models/{model}:generateContent"
+            response = requests.post(url, params={"key": self._key}, json=payload, timeout=120)
+            if response.ok:
+                return response.json()
+            last_error = response.text
+            if response.status_code != 404:
+                break
+        message = last_error or "unknown Gemini error"
+        if "no longer available to new users" in message.lower():
+            raise ProviderError(
+                "Gemini model access is unavailable for this key. Try GEMINI_MODEL=gemini-2.5-flash-lite "
+                "or create a fresh Gemini API key in AI Studio."
+            )
+        raise ProviderError(f"Gemini request failed: {message}")
 
 
 class GeminiMetadataProvider(MetadataProvider):

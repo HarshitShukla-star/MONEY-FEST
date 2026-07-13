@@ -7,8 +7,8 @@ import { PageHeader } from "@/components/page-header";
 import { Progress, StatusPill } from "@/components/ui";
 import { api } from "@/lib/api";
 
-const statIcons = { activity: Activity, check: CheckCircle2, clock: Clock3, upload: Upload };
-const statTones = { blue: "text-blue-300", emerald: "text-emerald-300", amber: "text-amber-200", violet: "text-violet-300" };
+const statIcons = { activity: Activity, check: CheckCircle2, clock: Clock3, upload: Upload } as const;
+const statTones = { blue: "text-blue-300", emerald: "text-emerald-300", amber: "text-amber-200", violet: "text-violet-300" } as const;
 
 export default function Dashboard() {
   const dashboardQuery = useQuery({ queryKey: ["dashboard"], queryFn: api.getDashboard });
@@ -22,7 +22,7 @@ export default function Dashboard() {
   return <>
     <PageHeader eyebrow="Overview" title={dashboard.greeting} description={dashboard.description} />
     <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-4">
-      {dashboard.stats.map((stat) => { const Icon = statIcons[stat.icon]; return <div className="panel p-5" key={stat.label}><div className="flex items-start justify-between"><span className="text-sm text-zinc-500">{stat.label}</span><Icon className={`h-4 w-4 ${statTones[stat.tone]}`} /></div><div className="mt-5 flex items-end justify-between gap-3"><strong className="text-3xl font-semibold tracking-tight">{stat.value}</strong><span className="text-right text-xs text-zinc-500">{stat.detail}</span></div></div>; })}
+      {dashboard.stats.map((stat) => { const Icon = statIcons[stat.icon as keyof typeof statIcons]; return <div className="panel p-5" key={stat.label}><div className="flex items-start justify-between"><span className="text-sm text-zinc-500">{stat.label}</span><Icon className={`h-4 w-4 ${statTones[stat.tone as keyof typeof statTones]}`} /></div><div className="mt-5 flex items-end justify-between gap-3"><strong className="text-3xl font-semibold tracking-tight">{stat.value}</strong><span className="text-right text-xs text-zinc-500">{stat.detail}</span></div></div>; })}
     </div>
     <div className="mt-5 grid gap-5 2xl:grid-cols-3">
       <section className="panel overflow-hidden 2xl:col-span-2"><div className="flex items-center justify-between border-b border-white/[.07] px-5 py-4"><div><h2 className="text-sm font-medium">Active pipeline</h2><p className="mt-1 text-xs text-zinc-500">{runningJobs.length} jobs currently processing</p></div><button type="button" className="text-xs text-violet-300 hover:text-violet-200">View pipeline</button></div><div className="space-y-5 p-5">{runningJobs.map((job) => <div key={job.id}><div className="mb-2 flex items-center justify-between gap-4 text-sm"><span className="truncate">{job.title}<span className="ml-2 text-xs text-zinc-500">{job.stage}</span></span><span className="text-xs text-zinc-400">{job.progress}%</span></div><Progress value={job.progress} /></div>)}</div></section>

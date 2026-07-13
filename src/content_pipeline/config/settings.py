@@ -34,7 +34,8 @@ class Settings(BaseSettings):
     log_format: str = Field(default="json", pattern="^(json|text)$")
     app_secret_key: SecretStr | None = None
     gemini_api_key: SecretStr | None = None
-    gemini_model: str = Field(default="gemini-2.0-flash", min_length=1)
+    gemini_model: str = Field(default="gemini-2.5-flash-lite", min_length=1)
+    local_output_dir: Path = Field(default=Path("output"))
     youtube_oauth_client_secrets_path: Path | None = None
     youtube_oauth_token_path: Path | None = None
 
