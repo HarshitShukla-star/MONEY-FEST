@@ -1,5 +1,0 @@
-"""Runtime configuration."""
-
-from content_pipeline.config.settings import Environment, Settings, get_settings
-
-__all__ = ["Environment", "Settings", "get_settings"]
